@@ -59,6 +59,15 @@ export function expressWs(app, httpServer, options = {}) {
       }
     };
 
+    /* If the dummyResponse is used to try to send something to the client (for example by .end()),
+     * Errors with incomprehensible messages are thrown. We cover this by explicitly throwing a Error
+     * with a clear message.
+     * _send is an internal function of OutgoingMessage objects which is called by .end(), .writeHead()
+     * etc. */
+    dummyResponse._send = function _send() {
+      throw new Error("express-ws: Trying to write to the response object of a Web Socket");
+    }
+
     app.handle(request, dummyResponse, error => {
       if (error) {
         console.error("express-ws: Error while handling some route for a websocket");

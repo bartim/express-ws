@@ -59,7 +59,11 @@ export function expressWs(app, httpServer, options = {}) {
       }
     };
 
-    app.handle(request, dummyResponse, () => {
+    app.handle(request, dummyResponse, error => {
+      if (error) {
+        console.error("express-ws: Error while handling some route for a websocket");
+        console.error(error.stack);
+      }
       if (!request.wsHandled) {
         /* There was no matching WebSocket-specific route for this request. We'll close
          * the connection, as no endpoint was able to handle the request anyway... */
